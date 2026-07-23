@@ -1065,10 +1065,14 @@
 </div>
 
 <script type="module">
-    import * as pdfjsLib from "../../lib/pdfjs/build/pdf.mjs";
-    import * as viewerLib from "../../lib/pdfjs/web/viewer.mjs";
+    import * as pdfjsLib from "{{{global.siteurl}}}/local/pdfjs/lib/pdfjs/build/pdf.mjs";
+    import * as viewerLib from "{{{global.siteurl}}}/local/pdfjs/lib/pdfjs/web/viewer.mjs";
 
     const unusedref = pdfjsLib; // Stops the import being removed by PHP Storm.
+
+    viewerLib.PDFViewerApplicationOptions.set('workerSrc', "{{{global.siteurl}}}/local/pdfjs/lib/pdfjs/build/pdf.worker.mjs");
+    viewerLib.PDFViewerApplicationOptions.set('enableComment', true);
+    viewerLib.PDFViewerApplicationOptions.set('defaultUrl', "");
 
     window.pdfcontroller = {
         currentfiledataset: null,

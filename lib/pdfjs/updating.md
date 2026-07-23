@@ -30,21 +30,3 @@ To allow SASS to compile, search and replace `:;` with `: ;`
 ### HTML
 
 Take the contents of the body tag in view.html and drop it into the `div.localpdfjs_pdfjswrapper` element in `viewpdf.mustache`
-
-### JS
-
-Set default options in web/viewer.mjs to:
-```
-defaultOptions.defaultUrl = {
-    value: "",
-    kind: OptionKind.VIEWER
-};
-defaultOptions.enableComment = {
-    value: true,
-    kind: OptionKind.VIEWER
-};
-  workerSrc: {
-    value: "../../lib/pdfjs/build/pdf.worker.mjs",
-    kind: OptionKind.WORKER
-  }
-```
