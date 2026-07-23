@@ -25,7 +25,7 @@ use core\antivirus\manager;
 use local_pdfjs\local\lib;
 
 const AJAX_SCRIPT = true;
-require(__DIR__ . '/../../config.php');
+require(__DIR__ . '/../../../config.php');
 
 // Authenticate the user.
 $pdfitemid = required_param('pdfitemid', PARAM_INT);

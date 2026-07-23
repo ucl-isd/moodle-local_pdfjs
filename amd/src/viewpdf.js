@@ -26,30 +26,32 @@ import {add as addToast} from 'core/toast';
 import Config from 'core/config';
 
 var controller = {
-    saveannotations: async function() {
-        const pdfdata = await window.pdfcontroller.getpdfdata();
-        const blob = new Blob([pdfdata], {type: "application/pdf"});
-        const data = new FormData();
-        data.append("annotations", blob, "annotated.pdf");
-        data.append('pdfitemid', controller.currentfiledataset.pdfitemid);
-        data.append('fileid', controller.currentfiledataset.fileid);
-        data.append('filename', controller.currentfiledataset.filename);
-        data.append('contextid', controller.currentfiledataset.contextid);
-        data.append('sesskey', Config.sesskey);
+    saveannotations: () => {
+        return window.viewerLib.PDFViewerApplication.pdfDocument.saveDocument()
+            .then(pdfdata => {
+                const blob = new Blob([pdfdata], {type: "application/pdf"});
+                const data = new FormData();
+                data.append("annotations", blob, "annotated.pdf");
+                data.append('pdfitemid', controller.currentfiledataset.pdfitemid);
+                data.append('fileid', controller.currentfiledataset.fileid);
+                data.append('filename', controller.currentfiledataset.filename);
+                data.append('contextid', controller.currentfiledataset.contextid);
+                data.append('sesskey', Config.sesskey);
 
-        const response = await fetch(Config.wwwroot + "/local/pdfjs/handlers/uploadannotatedsubmissionajax.php", {
-            method: "POST",
-            body: data,
-        });
-        const result = await response.json();
-
-        controller.currentfiledataset.annotatedfileurl = result.url;
-        controller.currentfiledataset.annotatedfileid = result.fileid;
-
-        await addToast(getString('annotationssaved', 'local_pdfjs'), {type: 'success'});
+                return fetch(Config.wwwroot + "/local/pdfjs/handlers/uploadannotatedsubmissionajax.php", {
+                    method: "POST",
+                    body: data,
+                });
+            })
+            .then(response => {
+                const result = response.json();
+                controller.currentfiledataset.annotatedfileurl = result.url;
+                controller.currentfiledataset.annotatedfileid = result.fileid;
+                return addToast(getString('annotationssaved', 'local_pdfjs'), {type: 'success'});
+            });
     },
 
-    loadpdf: async function(dataset) {
+    loadpdf: async function (dataset) {
         var url = dataset.href;
 
         if (dataset.annotatedfileurl) {
@@ -57,12 +59,11 @@ var controller = {
         }
         controller.currentfiledataset = dataset;
 
-        return window.pdfcontroller.loadpdf(url);
-
+        return window.viewerLib.PDFViewerApplication.open({url: url});
     },
 
-    clearannotations: async function() {
-        Ajax.call([{
+    clearannotations: () => {
+        return Ajax.call([{
             methodname: 'local_pdfjs_clearannotations',
             args: {
                 pdfitemid: controller.currentfiledataset.pdfitemid,
@@ -73,7 +74,7 @@ var controller = {
                 controller.currentfiledataset.annotatedfileurl = '';
                 controller.currentfiledataset.annotatedfileid = '';
                 controller.loadpdf(controller.currentfiledataset);
-                addToast(getString('annotationscleared', 'local_pdfjs'), {type: 'success'});
+                return addToast(getString('annotationscleared', 'local_pdfjs'), {type: 'success'});
             })
             .catch((error) => {
                 addToast(error, {type: 'error'});
@@ -82,15 +83,19 @@ var controller = {
 };
 
 
-export const init = async() => {
+export const init = async (formwrapperid) => {
     prefetchStrings('local_pdfjs', [
         'annotationssaved',
         'annotationscleared',
     ]);
 
-    let viewfilebuttons = document.querySelectorAll('[data-action="localpdfjs_viewfile"]');
+    const viewfilebuttons = document.querySelectorAll('[data-action="localpdfjs_viewfile"]');
+    const saveannotations = document.querySelector('[data-action="localpdfjs_saveannotations"]');
+    const clearannotations = document.querySelector('[data-action="localpdfjs_clearannotations"]');
+    const formwrapper = document.querySelector("#" + formwrapperid + " form");
+
     viewfilebuttons.forEach((node) => {
-            node.addEventListener("click", async(event) => {
+            node.addEventListener("click", async (event) => {
                 await controller.loadpdf(event.target.dataset).promise;
             });
         }
@@ -99,14 +104,24 @@ export const init = async() => {
         await controller.loadpdf(viewfilebuttons[0].dataset).promise;
     }
 
-    document.querySelector('[data-action="localpdfjs_saveannotations"]')
-        .addEventListener("click", async() => {
-            await controller.saveannotations().promise;
+    if (saveannotations) {
+        saveannotations.addEventListener("click", () => {
+            controller.saveannotations();
         });
+    }
 
-    document.querySelector('[data-action="localpdfjs_clearannotations"]')
-        .addEventListener("click", async() => {
-            await controller.clearannotations().promise;
+    if (clearannotations) {
+        clearannotations.addEventListener("click", () => {
+            controller.clearannotations();
         });
+    }
 
+    if (formwrapper) {
+        formwrapper.addEventListener("submit", (event => {
+            event.preventDefault();
+            controller.saveannotations().then(() => {
+                return event.target.submit();
+            });
+        }));
+    }
 };

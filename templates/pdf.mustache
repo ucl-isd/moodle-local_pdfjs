@@ -28,10 +28,12 @@
         >{{filename}}</button>
     {{/files}}
     {{! Save annotations button must have a tabindex or its blur event does not have a relatedtarget, which prevents pdf.js from persisting annotations !}}
-    <button class="btn btn-primary" tabindex="0" data-action="localpdfjs_saveannotations">{{#str}}
-        saveannotations, local_pdfjs{{/str}}</button>
-    <button class="btn btn-primary" data-action="localpdfjs_clearannotations">{{#str}}
-        clearannotations, local_pdfjs{{/str}}</button>
+    {{^formwrapperid}}
+        <button class="btn btn-primary" tabindex="0" data-action="localpdfjs_saveannotations">{{#str}}
+            saveannotations, local_pdfjs{{/str}}</button>
+        <button class="btn btn-primary" data-action="localpdfjs_clearannotations">{{#str}}
+            clearannotations, local_pdfjs{{/str}}</button>
+    {{/formwrapperid}}
 </div>
 
 <div class="localpdfjs_pdfjswrapper" style="height:1000px;">
@@ -1074,17 +1076,9 @@
     viewerLib.PDFViewerApplicationOptions.set('enableComment', true);
     viewerLib.PDFViewerApplicationOptions.set('defaultUrl', "");
 
-    window.pdfcontroller = {
-        currentfiledataset: null,
-        loadpdf: async function (url) {
-            await viewerLib.PDFViewerApplication.open({url: url});
-        },
-        getpdfdata: async function () {
-            return await viewerLib.PDFViewerApplication.pdfDocument.saveDocument();
-        },
-    };
+    window.viewerLib = viewerLib;
 
     require(['local_pdfjs/viewpdf'], function (viewpdf) {
-        viewpdf.init();
+        viewpdf.init("{{formwrapperid}}");
     });
 </script>

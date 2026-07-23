@@ -80,7 +80,7 @@ jobs:
         run: moodle-plugin-ci codechecker --exclude=moodle.Commenting.MissingDocblock,moodle.Commenting.DocblockDescription,moodle.PHPUnit.TestCaseCovers,moodle.Commenting.VariableComment --max-warnings 0
 
       - name: Validating
-        continue-on-error: true # Fails due to db prefix rule which is impossible to satisfy due to length of plugin name.
+        continue-on-error: true
         if: ${{ always() }}
         run: moodle-plugin-ci validate
 
@@ -89,7 +89,7 @@ jobs:
         run: moodle-plugin-ci savepoints
 
       - name: Mustache Lint
-        continue-on-error: true # Currently fails. We really ought to get this passing.
+        continue-on-error: true
         if: ${{ always() }}
         run: moodle-plugin-ci mustache
 

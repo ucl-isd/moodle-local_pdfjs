@@ -39,17 +39,19 @@ class pdf implements renderable, templatable {
     private context $context;
     private int $pdfitemid;
     private string $component;
+    private string $formwrapperid;
 
     /**
      * Constructor
      *
      * @param stored_file[] $files array of annotatable files
      */
-    public function __construct(array $files, context $context, string $component, int $pdfitemid) {
+    public function __construct(array $files, context $context, string $component, int $pdfitemid, string $formwrapperid = '') {
         $this->files = $files;
         $this->context = $context;
         $this->pdfitemid = $pdfitemid;
         $this->component = $component;
+        $this->formwrapperid = $formwrapperid;
     }
 
     /**
@@ -62,6 +64,7 @@ class pdf implements renderable, templatable {
 
         $template = new stdClass();
 
+        $template->formwrapperid = $this->formwrapperid;
         $template->files = [];
 
         $annotatedfiles = $this->get_file_annotations();
