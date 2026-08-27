@@ -1,4 +1,4 @@
-Get latest stable release from https://mozilla.github.io/pdf.js/
+Get latest stable release from https://github.com/mozilla/pdf.js/releases
 
 ## CSS
 
