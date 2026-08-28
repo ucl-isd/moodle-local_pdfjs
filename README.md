@@ -11,7 +11,8 @@ $html .= $this->output->render(new \local_pdfjs\output\pdf(
         $arrayofstoredfiles,
         $acontextobject,
         'frankenstylenameofmodule',
-        $idofthingbeingannotated
+        $idofthingbeingannotated,
+        'idofformelementtoautotriggersavingannotations'
     ));
 ````
 

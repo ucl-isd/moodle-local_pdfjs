@@ -45,6 +45,10 @@ class pdf implements renderable, templatable {
      * Constructor
      *
      * @param stored_file[] $files array of annotatable files
+     * @param context $context Context that annotated files will be placed in, probably an activity
+     * @param string $component Component that is annotating the files, e.g. mod_coursework
+     * @param int $pdfitemid ID of entity that the files relate to, e.g. a submission id
+     * @param string $formwrapperid ID of a form element that will trigger saving the annotations
      */
     public function __construct(array $files, context $context, string $component, int $pdfitemid, string $formwrapperid = '') {
         $this->files = $files;
