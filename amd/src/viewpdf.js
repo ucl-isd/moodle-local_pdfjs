@@ -92,7 +92,7 @@ export const init = async (formwrapperid) => {
     const viewfilebuttons = document.querySelectorAll('[data-action="localpdfjs_viewfile"]');
     const saveannotations = document.querySelector('[data-action="localpdfjs_saveannotations"]');
     const clearannotations = document.querySelector('[data-action="localpdfjs_clearannotations"]');
-    const formwrapper = document.querySelector("#" + formwrapperid + " form");
+    const formwrapper = document.querySelector("#" + (formwrapperid || 'noid') + " form");
 
     viewfilebuttons.forEach((node) => {
             node.addEventListener("click", async (event) => {

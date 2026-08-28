@@ -1,32 +1,16 @@
 Get latest stable release from https://github.com/mozilla/pdf.js/releases
+Copy contents into local/pdfjs/lib/pdfjs
 
-## CSS
+Reapply hacks to local/pdfjs/lib/pdfjs/viewer.html, in latest version this means:
 
-### Renamespacing
-Copy `viewer.css` to `wrapperviewer.scss`
-To namespace all CSS variables, search and replace
+`<script src="viewer.mjs" type="module"></script>`
 
-`:root`
+Becomes:
 
-to
-
-`&`
-
-Change:
-
-`[dir="rtl"]& {`
-
-to
-
-``&[dir="rtl"] {``
-
-### Tidying
-To allow SASS to compile, search and replace `:;` with `: ;`
-
-### Compile
-
-```sass wrappedviewer.scss > wrappedviewer.css```
-
-### HTML
-
-Take the contents of the body tag in view.html and drop it into the `div.localpdfjs_pdfjswrapper` element in `viewpdf.mustache`
+```
+    <!--
+  <script src="viewer.mjs" type="module"></script>
+    -->
+    <script src="customviewer.mjs" type="module"></script>
+    <link rel="stylesheet" href="customviewer.css" />
+```

@@ -25,6 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026073002;
+$plugin->version   = 2026082800;
 $plugin->requires  = 2018050800;
 $plugin->component = 'local_pdfjs';
