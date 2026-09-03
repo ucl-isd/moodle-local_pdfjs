@@ -120,6 +120,14 @@ export const init = async (formwrapperid) => {
         formwrapper.addEventListener("submit", (event => {
             event.preventDefault();
             controller.saveannotations().then(() => {
+                if (event.submitter.type === 'submit') {
+                    const input = window.document.createElement('input');
+                    input.setAttribute('type', 'hidden');
+                    input.setAttribute('name', event.submitter.name);
+                    input.setAttribute('value', event.submitter.value);
+                    event.target.appendChild(input);
+                }
+
                 return event.target.submit();
             });
         }));
