@@ -49,13 +49,22 @@ class pdf implements renderable, templatable {
      * @param string $component Component that is annotating the files, e.g. mod_coursework
      * @param int $pdfitemid ID of entity that the files relate to, e.g. a submission id
      * @param string $formwrapperid ID of a form element that will trigger saving the annotations
+     * @param bool $readonly Do we present annotation tools
      */
-    public function __construct(array $files, context $context, string $component, int $pdfitemid, string $formwrapperid = '') {
+    public function __construct(
+        array $files,
+        context $context,
+        string $component,
+        int $pdfitemid,
+        string $formwrapperid = '',
+        bool $readonly = false
+    ) {
         $this->files = $files;
         $this->context = $context;
         $this->pdfitemid = $pdfitemid;
         $this->component = $component;
         $this->formwrapperid = $formwrapperid;
+        $this->readonly = $readonly;
     }
 
     /**
@@ -68,7 +77,7 @@ class pdf implements renderable, templatable {
 
         $template = new stdClass();
 
-        $template->formwrapperid = $this->formwrapperid;
+        $template->formwrapperid = empty($this->readonly) ? $this->formwrapperid : null;
         $template->files = [];
 
         $annotatedfiles = $this->get_file_annotations();
@@ -105,12 +114,15 @@ class pdf implements renderable, templatable {
                 $model['annotatedfileid'] = $annotatedfile->get_id();
             }
 
-            lib::register_file_for_annotating($file->get_id());
+            if (!$this->readonly) {
+                lib::register_file_for_annotating($file->get_id());
+            }
 
             $template->files[] = (object)$model;
         }
 
         $template->multiplefiles = (count($template->files) > 1);
+        $template->readonly = $this->readonly;
 
         return $template;
     }

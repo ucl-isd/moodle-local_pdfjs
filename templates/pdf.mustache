@@ -28,12 +28,14 @@
         >{{filename}}</button>
     {{/files}}
     {{! Save annotations button must have a tabindex or its blur event does not have a relatedtarget, which prevents pdf.js from persisting annotations !}}
-    {{^formwrapperid}}
-        <button class="btn btn-primary" tabindex="0" data-action="localpdfjs_saveannotations">{{#str}}
-            saveannotations, local_pdfjs{{/str}}</button>
-        <button class="btn btn-primary" data-action="localpdfjs_clearannotations">{{#str}}
-            clearannotations, local_pdfjs{{/str}}</button>
-    {{/formwrapperid}}
+    {{^readonly}}
+        {{^formwrapperid}}
+            <button class="btn btn-primary" tabindex="0" data-action="localpdfjs_saveannotations">{{#str}}
+                saveannotations, local_pdfjs{{/str}}</button>
+            <button class="btn btn-primary" data-action="localpdfjs_clearannotations">{{#str}}
+                clearannotations, local_pdfjs{{/str}}</button>
+        {{/formwrapperid}}
+    {{/readonly}}
 </div>
 
 <div class="embed-responsive embed-responsive-4by3">
@@ -47,5 +49,5 @@
             viewpdf.init("{{formwrapperid}}");
         });
     }
-    document.getElementById('pdfjsiframe').src="{{{global.siteurl}}}/local/pdfjs/lib/pdfjs/web/viewer.html";
+    document.getElementById('pdfjsiframe').src = "{{{global.siteurl}}}/local/pdfjs/lib/pdfjs/web/viewer.html?readonly={{readonly}}";
 </script>
