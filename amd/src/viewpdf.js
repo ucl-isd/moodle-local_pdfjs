@@ -118,6 +118,12 @@ export const init = async (formwrapperid) => {
 
     if (formwrapper) {
         formwrapper.addEventListener("submit", (event => {
+            // Exit if no annotations have been added/removed/modified.
+            const map = window.viewerLib.PDFViewerApplication.pdfDocument.annotationStorage.serializable.map;
+            if (!map || map.size === 0) {
+                return;
+            }
+
             event.preventDefault();
             controller.saveannotations().then(() => {
                 if (event.submitter.type === 'submit') {
