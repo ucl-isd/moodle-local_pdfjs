@@ -23,6 +23,7 @@
 
 namespace local_pdfjs\local;
 
+use core\context;
 use Exception;
 
 class lib {
@@ -47,6 +48,50 @@ class lib {
 
         if (!in_array($fileid, $SESSION->local_pdfjs_annotatingfiles)) {
             throw new Exception('file not registered for annotating');
+        }
+    }
+
+    public static function remove_annotations(context $context, int $pdfitemid): void {
+        $files = get_file_storage()->get_area_files(
+            $context->id,
+            'local_pdfjs',
+            'pdfannotations',
+            $pdfitemid
+        );
+
+        foreach ($files as $file) {
+            $file->delete();
+        }
+    }
+
+    // Where annotations were given a provisional itemid based on their original source file
+    // reallocate them to the new item id.
+    // Useful when the annotations may have been saved before the object they are directly associated with.
+    public static function reallocate_annotations(context $context, int $sourceitemid, int $targetitemid, int $userid): void {
+        $fs = get_file_storage();
+
+        $files = $fs->get_area_files(
+            $context->id,
+            'local_pdfjs',
+            'pdfannotations',
+            $sourceitemid
+        );
+
+        foreach ($files as $filetomove) {
+            $sourcefile = $fs->get_file_by_id($filetomove->get_source());
+
+            if (
+                !$sourcefile
+                ||
+                (int)$sourcefile->get_itemid() !== $sourceitemid
+                ||
+                (int)$sourcefile->get_userid() !== $userid
+            ) {
+                continue;
+            }
+
+            $fs->create_file_from_storedfile(['itemid' => $targetitemid], $filetomove);
+            $filetomove->delete();
         }
     }
 }
