@@ -57,7 +57,7 @@ class pdf implements renderable, templatable {
         string $component,
         int $pdfitemid,
         string $formwrapperid = '',
-        bool $readonly = false
+        bool $readonly = true
     ) {
         $this->files = $files;
         $this->context = $context;
