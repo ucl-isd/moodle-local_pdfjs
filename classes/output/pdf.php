@@ -123,6 +123,7 @@ class pdf implements renderable, templatable {
 
         $template->multiplefiles = (count($template->files) > 1);
         $template->readonly = $this->readonly;
+        $template->pdfjsinstanceid = uniqid($this->pdfitemid);
 
         return $template;
     }

@@ -14,7 +14,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 
-<div class="row m-3">
+<div class="row m-3" data-pdfjsinstanceid="{{pdfjsinstanceid}}">
     {{#files}}
         <button class="btn btn-primary {{^multiplefiles}}d-none{{/multiplefiles}}"
                 data-href="{{{href}}}"
@@ -39,15 +39,16 @@
 </div>
 
 <div class="embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" id="pdfjsiframe"></iframe>
+    <iframe class="embed-responsive-item" data-pdfjsinstanceid="{{pdfjsinstanceid}}" loading="lazy"></iframe>
 </div>
 
-<script type="module">
-    const bc = new BroadcastChannel("pdfjs");
-    bc.onmessage = () => {
-        require(['local_pdfjs/viewpdf'], function (viewpdf) {
-            viewpdf.init("{{formwrapperid}}");
-        });
+{{#js}}
+    new BroadcastChannel("pdfjs").onmessage = (message) => {
+        if (message.data == '{{pdfjsinstanceid}}') {
+            require(['local_pdfjs/viewpdf'], function (viewpdf) {
+                viewpdf.init("{{formwrapperid}}", '{{pdfjsinstanceid}}'), {{readonly}};
+            });
+        }
     }
-    document.getElementById('pdfjsiframe').src = "{{{global.siteurl}}}/local/pdfjs/lib/pdfjs/web/viewer.html?readonly={{readonly}}";
-</script>
+    document.querySelector('iframe[data-pdfjsinstanceid="{{pdfjsinstanceid}}"]').src = "{{{global.siteurl}}}/local/pdfjs/lib/pdfjs/web/viewer.html?readonly={{readonly}}&pdfjsinstanceid={{pdfjsinstanceid}}";
+{{/js}}

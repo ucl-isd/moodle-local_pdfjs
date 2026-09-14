@@ -27,7 +27,7 @@ import Config from 'core/config';
 
 var controller = {
     saveannotations: () => {
-        return window.viewerLib.PDFViewerApplication.pdfDocument.saveDocument()
+        return controller.PDFViewerApplication.pdfDocument.saveDocument()
             .then(pdfdata => {
                 const blob = new Blob([pdfdata], {type: "application/pdf"});
                 const data = new FormData();
@@ -59,7 +59,7 @@ var controller = {
         }
         controller.currentfiledataset = dataset;
 
-        return window.viewerLib.PDFViewerApplication.open({url: url});
+        return controller.PDFViewerApplication.open({url: url});
     },
 
     clearannotations: () => {
@@ -83,15 +83,18 @@ var controller = {
 };
 
 
-export const init = async (formwrapperid) => {
+export const init = async (formwrapperid, pdfjsinstanceid, readonly) => {
     prefetchStrings('local_pdfjs', [
         'annotationssaved',
         'annotationscleared',
     ]);
 
-    const viewfilebuttons = document.querySelectorAll('[data-action="localpdfjs_viewfile"]');
-    const saveannotations = document.querySelector('[data-action="localpdfjs_saveannotations"]');
-    const clearannotations = document.querySelector('[data-action="localpdfjs_clearannotations"]');
+    controller.PDFViewerApplication = window.viewerLib[pdfjsinstanceid].PDFViewerApplication;
+
+    const rootselector = '[data-pdfjsinstanceid="' + pdfjsinstanceid + '"] ';
+    const viewfilebuttons = document.querySelectorAll(rootselector + '[data-action="localpdfjs_viewfile"]');
+    const saveannotations = document.querySelector(rootselector + '[data-action="localpdfjs_saveannotations"]');
+    const clearannotations = document.querySelector(rootselector + '[data-action="localpdfjs_clearannotations"]');
     const formwrapper = document.querySelector("#" + (formwrapperid || 'noid') + " form");
 
     viewfilebuttons.forEach((node) => {
@@ -104,22 +107,22 @@ export const init = async (formwrapperid) => {
         await controller.loadpdf(viewfilebuttons[0].dataset).promise;
     }
 
-    if (saveannotations) {
+    if (!readonly && saveannotations) {
         saveannotations.addEventListener("click", () => {
             controller.saveannotations();
         });
     }
 
-    if (clearannotations) {
+    if (!readonly && clearannotations) {
         clearannotations.addEventListener("click", () => {
             controller.clearannotations();
         });
     }
 
-    if (formwrapper) {
+    if (!readonly && formwrapper) {
         formwrapper.addEventListener("submit", (event => {
             // Exit if no annotations have been added/removed/modified.
-            const map = window.viewerLib.PDFViewerApplication.pdfDocument.annotationStorage.serializable.map;
+            const map = controller.PDFViewerApplication.pdfDocument.annotationStorage.serializable.map;
             if (!map || map.size === 0) {
                 return;
             }
