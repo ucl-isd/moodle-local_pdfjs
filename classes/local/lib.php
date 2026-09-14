@@ -64,6 +64,15 @@ class lib {
         }
     }
 
+    public static function fetch_annotations(context $context, int $pdfitemid): array {
+        return get_file_storage()->get_area_files(
+            $context->id,
+            'local_pdfjs',
+            'pdfannotations',
+            $pdfitemid
+        );
+    }
+
     // Where annotations were given a provisional itemid based on their original source file
     // reallocate them to the new item id.
     // Useful when the annotations may have been saved before the object they are directly associated with.
