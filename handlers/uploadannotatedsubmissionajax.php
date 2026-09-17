@@ -38,7 +38,7 @@ $context = context::instance_by_id($contextid);
 
 require_login($context->get_course_context()->instanceid);
 require_capability('local/pdfjs:annotatepdf', $context);
-lib::require_file_registered_for_annotating($fileid);
+lib::file_registered_for_annotating($fileid);
 require_sesskey();
 
 $fs = get_file_storage();

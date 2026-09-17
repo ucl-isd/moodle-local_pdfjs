@@ -112,6 +112,7 @@ class pdf implements renderable, templatable {
                     $annotatedfile->get_filename()
                 );
                 $model['annotatedfileid'] = $annotatedfile->get_id();
+                lib::register_file_for_viewing($annotatedfile->get_id());
             }
 
             if (!$this->readonly) {
@@ -128,9 +129,51 @@ class pdf implements renderable, templatable {
         return $template;
     }
 
-    private function get_file_annotations(): array {
-        global $USER;
+    public function get_pdfjs_file_viewers(): array {
+        $retval = [];
 
+        foreach ($this->get_annotatedfile_urls() as $fileurl) {
+            $retval[] = new moodle_url("/local/pdfjs/lib/pdfjs/web/viewer.html", ['filepath' => $fileurl, 'readonly' => true]);
+        }
+
+        return $retval;
+    }
+
+    /**
+     * Export this data so it can be used as the context for a mustache template.
+     *
+     * @param renderer_base $output The renderer
+     * @return stdClass Data to be used by the template
+     */
+    public function get_annotatedfile_urls(): array {
+        $retval = [];
+
+        $annotatedfiles = $this->get_file_annotations();
+        foreach ($this->files as $file) {
+            if ($file->get_mimetype() !== 'application/pdf') {
+                continue;
+            }
+            lib::register_file_for_viewing($file->get_id());
+
+            if (isset($annotatedfiles[$file->get_id()])) {
+                $annotatedfile = $annotatedfiles[$file->get_id()];
+
+                $retval[] = moodle_url::make_pluginfile_url(
+                    $annotatedfile->get_contextid(),
+                    'local_pdfjs',
+                    $annotatedfile->get_filearea(),
+                    $annotatedfile->get_itemid(),
+                    $annotatedfile->get_filepath(),
+                    $annotatedfile->get_filename()
+                );
+                lib::register_file_for_viewing($annotatedfile->get_id());
+            }
+        }
+
+        return $retval;
+    }
+
+    private function get_file_annotations(): array {
         $fs = new file_storage();
 
         $annotatedfiles = [];
@@ -142,9 +185,6 @@ class pdf implements renderable, templatable {
         );
 
         foreach ($files as $file) {
-            if ($file->get_userid() !== $USER->id) {
-                continue;
-            }
             if ($file->get_filename() == '.') {
                 continue;
             }

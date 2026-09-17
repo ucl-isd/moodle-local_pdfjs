@@ -71,7 +71,7 @@ class clearannotations extends external_api {
         }
 
         require_capability('local/pdfjs:annotatepdf', context::instance_by_id($file->get_contextid()));
-        lib::require_file_registered_for_annotating($file->get_source());
+        lib::file_registered_for_annotating($file->get_source());
         if (
             $file->get_userid() != $USER->id
             || $file->get_itemid() != $pdfitemid

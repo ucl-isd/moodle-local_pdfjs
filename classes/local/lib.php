@@ -43,12 +43,36 @@ class lib {
         }
     }
 
-    public static function require_file_registered_for_annotating(int $fileid): void {
+    public static function file_registered_for_annotating(int $fileid): bool {
         global $SESSION;
 
-        if (!in_array($fileid, $SESSION->local_pdfjs_annotatingfiles)) {
-            throw new Exception('file not registered for annotating');
+        return
+            isset($SESSION->local_pdfjs_annotatingfiles)
+            &&
+            in_array($fileid, $SESSION->local_pdfjs_annotatingfiles);
+    }
+    public static function register_file_for_viewing(int $fileid): void {
+        global $SESSION;
+
+        if (!isset($SESSION)) {
+            throw new Exception('session not set');
         }
+
+        if (!isset($SESSION->local_pdfjs_viewingfiles)) {
+            $SESSION->local_pdfjs_viewingfiles = [];
+        }
+
+        if (!in_array($fileid, $SESSION->local_pdfjs_viewingfiles)) {
+            $SESSION->local_pdfjs_viewingfiles[] = $fileid;
+        }
+    }
+
+    public static function file_registered_for_viewing(int $fileid): bool {
+        global $SESSION;
+
+        return
+            isset($SESSION->local_pdfjs_viewingfiles)
+            && in_array($fileid, $SESSION->local_pdfjs_viewingfiles);
     }
 
     public static function remove_annotations(context $context, int $pdfitemid): void {

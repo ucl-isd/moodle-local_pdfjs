@@ -55,7 +55,14 @@ function local_pdfjs_pluginfile($course, $cm, $context, $filearea, $args, $force
     if (!$file || $file->is_directory()) {
         return false;
     }
-    lib::require_file_registered_for_annotating($file->get_source());
+
+    if (
+        !lib::file_registered_for_annotating($file->get_source())
+        &&
+        !lib::file_registered_for_viewing($file->get_id())
+    ) {
+        throw new Exception('file not registered for viewing');
+    }
 
     send_stored_file($file, 0);
     return true;
