@@ -27,7 +27,9 @@ import Config from 'core/config';
 
 var controller = {
     saveannotations: (currentfiledataset) => {
-        return window.viewerLib[currentfiledataset.pdfjsinstanceid].PDFViewerApplication.pdfDocument.saveDocument()
+        var pdfjsinstance = window.viewerLib[currentfiledataset.pdfjsinstanceid];
+
+        return pdfjsinstance.PDFViewerApplication.pdfDocument.saveDocument()
             .then(pdfdata => {
                 const blob = new Blob([pdfdata], {type: "application/pdf"});
                 const data = new FormData();
@@ -47,6 +49,9 @@ var controller = {
                 const result = response.json();
                 currentfiledataset.annotatedfileurl = result.url;
                 currentfiledataset.annotatedfileid = result.fileid;
+
+                pdfjsinstance.PDFViewerApplication.pdfDocument.annotationStorage.resetModified();
+
                 return addToast(getString('annotationssaved', 'local_pdfjs'), {type: 'success'});
             });
     },
@@ -122,8 +127,9 @@ export const init = async (formwrapperid, pdfjsinstanceid, readonly) => {
 
     if (!readonly && formwrapper) {
         formwrapper.addEventListener("submit", (event => {
+            var pdfjsintance = window.viewerLib[pdfjsinstanceid];
             // Exit if no annotations have been added/removed/modified.
-            if (!window.viewerLib[pdfjsinstanceid].PDFViewerApplication._hasChanges()) {
+            if (!pdfjsintance.PDFViewerApplication._hasChanges()) {
                 return;
             }
 
@@ -136,6 +142,9 @@ export const init = async (formwrapperid, pdfjsinstanceid, readonly) => {
                     input.setAttribute('value', event.submitter.value);
                     event.target.appendChild(input);
                 }
+                pdfjsintance.PDFViewerApplication._hasChanges = function () {
+                    return false;
+                };
 
                 return event.target.submit();
             });
