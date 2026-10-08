@@ -14,9 +14,9 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 
-<div class="row m-3" data-pdfjsinstanceid="{{pdfjsinstanceid}}">
+<div class="m-3" data-pdfjsinstanceid="{{pdfjsinstanceid}}">
     {{#files}}
-        <button class="btn btn-primary {{^multiplefiles}}d-none{{/multiplefiles}}"
+        <button class="btn btn-link {{^multiplefiles}}d-none{{/multiplefiles}}"
                 data-href="{{{href}}}"
                 data-action="localpdfjs_viewfile"
                 data-fileid="{{fileid}}"
@@ -26,20 +26,22 @@
                 data-annotatedfileurl="{{annotatedfileurl}}"
                 data-annotatedfileid="{{annotatedfileid}}"
                 data-pdfjsinstanceid="{{pdfjsinstanceid}}"
-        >{{filename}}</button>
+        ><i class="fa-regular fa-file-lines mr-1"></i>{{filename}}</button>
     {{/files}}
     {{! Save annotations button must have a tabindex or its blur event does not have a relatedtarget, which prevents pdf.js from persisting annotations !}}
     {{^readonly}}
         {{^formwrapperid}}
-            <button class="btn btn-primary" tabindex="0" data-action="localpdfjs_saveannotations">{{#str}}
+        <div>
+            <button class="btn btn-primary mx-2" tabindex="0" data-action="localpdfjs_saveannotations">{{#str}}
                 saveannotations, local_pdfjs{{/str}}</button>
-            <button class="btn btn-primary" data-action="localpdfjs_clearannotations">{{#str}}
+            <button class="btn btn-danger" data-action="localpdfjs_clearannotations">{{#str}}
                 clearannotations, local_pdfjs{{/str}}</button>
+        </div>
         {{/formwrapperid}}
     {{/readonly}}
 </div>
 
-<div class="embed-responsive embed-responsive-4by3">
+<div class="min-vh-100 embed-responsive embed-responsive-4by3">
     <iframe class="embed-responsive-item" data-pdfjsinstanceid="{{pdfjsinstanceid}}" loading="lazy"></iframe>
 </div>
 
