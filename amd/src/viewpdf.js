@@ -88,6 +88,8 @@ var controller = {
 
 
 export const init = async (formwrapperid, pdfjsinstanceid, readonly) => {
+    var currentfiledataset;
+
     prefetchStrings('local_pdfjs', [
         'annotationssaved',
         'annotationscleared',
@@ -100,13 +102,12 @@ export const init = async (formwrapperid, pdfjsinstanceid, readonly) => {
     const formwrapper = document.querySelector("#" + (formwrapperid || 'noid') + " form");
 
     viewfilebuttons.forEach((node) => {
-            node.addEventListener("click", async () => {
+            node.addEventListener("click", async(event) => {
+                currentfiledataset = event.target.dataset;
                 await controller.loadpdf(currentfiledataset).promise;
             });
         }
     );
-
-    var currentfiledataset;
 
     if (viewfilebuttons[0]) {
         currentfiledataset = viewfilebuttons[0].dataset;
