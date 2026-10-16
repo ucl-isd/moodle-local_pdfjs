@@ -29,6 +29,7 @@ var controller = {
     saveannotations: (currentfiledataset) => {
         var pdfjsinstance = window.viewerLib[currentfiledataset.pdfjsinstanceid];
 
+        pdfjsinstance.PDFViewerApplication.pdfViewer._layerProperties.annotationEditorUIManager?.endCurrentEditing();
         return pdfjsinstance.PDFViewerApplication.pdfDocument.saveDocument()
             .then(pdfdata => {
                 const blob = new Blob([pdfdata], {type: "application/pdf"});
