@@ -29,16 +29,6 @@
         ><i class="fa-regular fa-file-lines mr-1"></i>{{filename}}</button>
     {{/files}}
     {{! Save annotations button must have a tabindex or its blur event does not have a relatedtarget, which prevents pdf.js from persisting annotations !}}
-    {{^readonly}}
-        {{^formwrapperid}}
-        <div>
-            <button class="btn btn-primary mx-2" tabindex="0" data-action="localpdfjs_saveannotations">{{#str}}
-                saveannotations, local_pdfjs{{/str}}</button>
-            <button class="btn btn-danger" data-action="localpdfjs_clearannotations">{{#str}}
-                clearannotations, local_pdfjs{{/str}}</button>
-        </div>
-        {{/formwrapperid}}
-    {{/readonly}}
 </div>
 
 <div class="min-vh-100 embed-responsive embed-responsive-4by3">
@@ -46,12 +36,8 @@
 </div>
 
 {{#js}}
-    new BroadcastChannel("pdfjs").onmessage = (message) => {
-        if (message.data == '{{pdfjsinstanceid}}') {
-            require(['local_pdfjs/viewpdf'], function (viewpdf) {
-                viewpdf.init("{{formwrapperid}}", '{{pdfjsinstanceid}}'), {{readonly}};
-            });
-        }
-    }
+    require(['local_pdfjs/viewpdf'], function (viewpdf) {
+        viewpdf.init("{{formwrapperid}}", '{{pdfjsinstanceid}}'), {{readonly}};
+    });
     document.querySelector('iframe[data-pdfjsinstanceid="{{pdfjsinstanceid}}"]').src = "{{{global.siteurl}}}/local/pdfjs/lib/pdfjs/web/viewer.html?readonly={{readonly}}&pdfjsinstanceid={{pdfjsinstanceid}}";
 {{/js}}
