@@ -32,7 +32,7 @@ require(__DIR__ . '/../../../config.php');
 $pdfitemid = required_param('pdfitemid', PARAM_INT);
 $annotatedfileid = required_param('annotatedfileid', PARAM_INT);
 
-lib::file_registered_for_annotating($annotatedfileid);
+lib::require_file_registered_for_annotating($annotatedfileid);
 require_sesskey();
 
 $fs = get_file_storage();
@@ -63,35 +63,7 @@ if (($uploadedfile['size'] > get_max_upload_file_size($CFG->maxbytes))) {
 
 manager::scan_file($uploadedfile['tmp_name'], $uploadedfile['name'], true);
 
-$fs = get_file_storage();
-// Check if the user already has annotations stored against this file.
-$existingfiles = $fs->get_area_files(
-    $context->id,
-    'local_pdfjs',
-    'pdfannotations',
-    $pdfitemid
-);
-
-foreach ($existingfiles as $existingfile) {
-    if ($existingfile->get_source() == $annotatedfileid) {
-        $existingfile->delete();
-    }
-}
-
-$filerecord = new stdClass();
-$filerecord->component = 'local_pdfjs';
-$filerecord->contextid = $context->id;
-$filerecord->userid = $USER->id;
-$filerecord->filearea = 'pdfannotations';
-$filerecord->filename = $annotatedfile->get_filename();
-$filerecord->filepath = '/';
-$filerecord->itemid = $pdfitemid;
-$filerecord->license = $CFG->sitedefaultlicense;
-$filerecord->author = fullname($USER);
-$filerecord->source = $annotatedfile->get_id();
-$filerecord->filesize = $uploadedfile['size'];
-
-$annotationfile = $fs->create_file_from_pathname($filerecord, $uploadedfile['tmp_name']);
+$annotationfile = lib::save_annotations($annotatedfile, $pdfitemid, $uploadedfile['tmp_name'], $uploadedfile['size']);
 
 echo json_encode((object)[
     'fileid' => $annotationfile->get_id(),

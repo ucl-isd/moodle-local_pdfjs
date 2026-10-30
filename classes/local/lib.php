@@ -25,6 +25,9 @@ namespace local_pdfjs\local;
 
 use core\context;
 use Exception;
+use moodle_exception;
+use stdClass;
+use stored_file;
 
 class lib {
     public static function register_file_for_annotating(int $fileid): void {
@@ -50,6 +53,12 @@ class lib {
             isset($SESSION->local_pdfjs_annotatingfiles)
             &&
             in_array($fileid, $SESSION->local_pdfjs_annotatingfiles);
+    }
+
+    public static function require_file_registered_for_annotating(int $fileid): void {
+        if (!self::file_registered_for_annotating($fileid)) {
+            throw new moodle_exception('filenotregisteredforannotating', 'local_pdfjs');
+        }
     }
 
     public static function register_file_for_viewing(int $fileid): void {
@@ -87,6 +96,45 @@ class lib {
         foreach ($files as $file) {
             $file->delete();
         }
+    }
+
+    // Store the annotated copy of a file, replacing any annotations already stored against it.
+    public static function save_annotations(
+        stored_file $annotatedfile,
+        int $pdfitemid,
+        string $pathname,
+        int $filesize
+    ): stored_file {
+        global $CFG, $USER;
+
+        $fs = get_file_storage();
+        $existingfiles = $fs->get_area_files(
+            $annotatedfile->get_contextid(),
+            'local_pdfjs',
+            'pdfannotations',
+            $pdfitemid
+        );
+
+        foreach ($existingfiles as $existingfile) {
+            if ($existingfile->get_source() == $annotatedfile->get_id()) {
+                $existingfile->delete();
+            }
+        }
+
+        $filerecord = new stdClass();
+        $filerecord->component = 'local_pdfjs';
+        $filerecord->contextid = $annotatedfile->get_contextid();
+        $filerecord->userid = $USER->id;
+        $filerecord->filearea = 'pdfannotations';
+        $filerecord->filename = $annotatedfile->get_filename();
+        $filerecord->filepath = '/';
+        $filerecord->itemid = $pdfitemid;
+        $filerecord->license = $CFG->sitedefaultlicense;
+        $filerecord->author = fullname($USER);
+        $filerecord->source = $annotatedfile->get_id();
+        $filerecord->filesize = $filesize;
+
+        return $fs->create_file_from_pathname($filerecord, $pathname);
     }
 
     public static function fetch_annotations(context $context, int $pdfitemid): array {
