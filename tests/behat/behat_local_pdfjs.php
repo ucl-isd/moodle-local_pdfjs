@@ -32,7 +32,7 @@ class behat_local_pdfjs extends behat_base {
     /**
      * Open a file's tab in the pdf.js viewer inside an element and switch into it, waiting for the PDF to load.
      *
-     * @Given /^I switch to the PDF viewer for "(?P<filename_string>(?:[^"]|\\")*)" in the "(?P<element_string>(?:[^"]|\\")*)" "(?P<selector_string>[^"]*)"$/
+     * @Given I switch to the PDF viewer for :filename in the :element :selectortype
      * @param string $filename
      * @param string $element
      * @param string $selectortype

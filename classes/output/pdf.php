@@ -143,7 +143,10 @@ class pdf implements renderable, templatable {
         $retval = [];
 
         foreach ($this->get_annotatedfile_urls() as $filename => $fileurl) {
-            $retval[$filename] = new moodle_url("/local/pdfjs/lib/pdfjs/web/viewer.html", ['filepath' => $fileurl, 'readonly' => true]);
+            $retval[$filename] = new moodle_url(
+                "/local/pdfjs/lib/pdfjs/web/viewer.html",
+                ['filepath' => $fileurl, 'readonly' => true]
+            );
         }
 
         return $retval;
