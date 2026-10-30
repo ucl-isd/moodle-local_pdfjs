@@ -52,12 +52,12 @@ class pdf implements renderable, templatable {
      * @param bool $readonly Do we present annotation tools
      */
     public function __construct(
-        array   $files,
+        array $files,
         context $context,
-        string  $component,
-        int     $pdfitemid,
-        string  $formwrapperid = '',
-        bool    $readonly = true
+        string $component,
+        int $pdfitemid,
+        string $formwrapperid = '',
+        bool $readonly = true
     ) {
         $this->files = $files;
         $this->context = $context;
@@ -125,7 +125,7 @@ class pdf implements renderable, templatable {
                     'readonly' => $this->readonly,
                     'pdfitemid' => $this->pdfitemid,
                     'fileid' => $file->get_id(),
-                    'filepath' => $model['annotatedfileurl'] ?? $model['fileurl']
+                    'filepath' => $model['annotatedfileurl'] ?? $model['fileurl'],
                 ]
             );
             $model['pdfviewerurl'] = $pdfviewerurl->out();
