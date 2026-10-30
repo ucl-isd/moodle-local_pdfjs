@@ -23,6 +23,7 @@
 
 $string['annotationscleared'] = 'Annotations cleared';
 $string['annotationssaved'] = 'Annotations saved';
+$string['annotationssavefailed'] = 'Annotations could not be saved';
 $string['clearannotations'] = 'Clear annotations';
 $string['refreshpageforchanges'] = 'Please refresh page to see changes';
 $string['saveannotations'] = 'Save annotations';

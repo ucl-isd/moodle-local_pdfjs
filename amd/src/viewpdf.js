@@ -89,6 +89,8 @@ export const init = async (formwrapperid, pdfitemid, readonly) => {
         'annotationssaved',
         'annotationscleared',
         'annotationssavefailed',
+        'saveannotations',
+        'clearannotations',
     ]);
 
     const formwrapper = document.querySelector("#" + (formwrapperid || 'noid') + " form");
