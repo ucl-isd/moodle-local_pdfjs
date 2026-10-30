@@ -14,30 +14,38 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 
-<div class="m-3" data-pdfjsinstanceid="{{pdfjsinstanceid}}">
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     {{#files}}
-        <button class="btn btn-link {{^multiplefiles}}d-none{{/multiplefiles}}"
-                data-href="{{{href}}}"
-                data-action="localpdfjs_viewfile"
-                data-fileid="{{fileid}}"
-                data-pdfitemid="{{pdfitemid}}"
-                data-filename="{{filename}}"
-                data-contextid="{{contextid}}"
-                data-annotatedfileurl="{{annotatedfileurl}}"
-                data-annotatedfileid="{{annotatedfileid}}"
-                data-pdfjsinstanceid="{{pdfjsinstanceid}}"
-        ><i class="fa-regular fa-file-lines mr-1"></i>{{filename}}</button>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {{#isfirst}}active{{/isfirst}}" id="pills_{{pdfitemid}}_{{fileid}}"
+                    data-toggle="pill"
+                    data-target="#pdfjsiframe_{{pdfitemid}}_{{fileid}}"
+                    type="button"
+                    role="tab"
+                    aria-controls="pills-home"
+                    aria-selected="true">{{filename}}</button>
+        </li>
     {{/files}}
-    {{! Save annotations button must have a tabindex or its blur event does not have a relatedtarget, which prevents pdf.js from persisting annotations !}}
-</div>
-
-<div class="min-vh-100 embed-responsive embed-responsive-4by3">
-    <iframe class="embed-responsive-item" data-pdfjsinstanceid="{{pdfjsinstanceid}}" loading="lazy"></iframe>
+</ul>
+<div class="tab-content min-vh-100 embed-responsive embed-responsive-4by3" id="pills-tabContent">
+    {{#files}}
+        <iframe
+                aria-labelledby="pills_{{pdfitemid}}_{{fileid}}"
+                role="tabpanel"
+                id="pdfjsiframe_{{pdfitemid}}_{{fileid}}"
+                class="tab-pane fade embed-responsive-item {{#isfirst}}show active{{/isfirst}}"
+                data-pdfitemid="{{pdfitemid}}"
+                data-fileid="{{fileid}}"
+                data-fileurl="{{fileurl}}"
+                data-annotatedfileurl="{{annotatedfileurl}}"
+                src="{{{pdfviewerurl}}}"
+                loading="lazy"
+        ></iframe>
+    {{/files}}
 </div>
 
 {{#js}}
     require(['local_pdfjs/viewpdf'], function (viewpdf) {
-        viewpdf.init("{{formwrapperid}}", '{{pdfjsinstanceid}}'), {{readonly}};
+    viewpdf.init("{{formwrapperid}}", '{{pdfitemid}}'), {{readonly}};
     });
-    document.querySelector('iframe[data-pdfjsinstanceid="{{pdfjsinstanceid}}"]').src = "{{{global.siteurl}}}/local/pdfjs/lib/pdfjs/web/viewer.html?readonly={{readonly}}&pdfjsinstanceid={{pdfjsinstanceid}}";
 {{/js}}

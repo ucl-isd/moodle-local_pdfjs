@@ -26,3 +26,5 @@ $string['annotationssaved'] = 'Annotations saved';
 $string['clearannotations'] = 'Clear annotations';
 $string['refreshpageforchanges'] = 'Please refresh page to see changes';
 $string['saveannotations'] = 'Save annotations';
+$string['pdfjs:annotatepdf'] = 'Annotate PDF';
+$string['pdfjs:viewannotations'] = 'View annotations';

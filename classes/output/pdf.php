@@ -52,12 +52,12 @@ class pdf implements renderable, templatable {
      * @param bool $readonly Do we present annotation tools
      */
     public function __construct(
-        array $files,
+        array   $files,
         context $context,
-        string $component,
-        int $pdfitemid,
-        string $formwrapperid = '',
-        bool $readonly = true
+        string  $component,
+        int     $pdfitemid,
+        string  $formwrapperid = '',
+        bool    $readonly = true
     ) {
         $this->files = $files;
         $this->context = $context;
@@ -78,9 +78,11 @@ class pdf implements renderable, templatable {
         $template = new stdClass();
 
         $template->formwrapperid = empty($this->readonly) ? $this->formwrapperid : null;
+        $template->pdfitemid = $this->pdfitemid;
         $template->files = [];
 
         $annotatedfiles = $this->get_file_annotations();
+        $isfirst = true;
         foreach ($this->files as $file) {
             if ($file->get_mimetype() !== 'application/pdf') {
                 continue;
@@ -88,7 +90,7 @@ class pdf implements renderable, templatable {
 
             $model = [
                 'filename' => $file->get_filename(),
-                'href' => moodle_url::make_pluginfile_url(
+                'fileurl' => moodle_url::make_pluginfile_url(
                     $file->get_contextid(),
                     $this->component,
                     $file->get_filearea(),
@@ -96,35 +98,42 @@ class pdf implements renderable, templatable {
                     $file->get_filepath(),
                     $file->get_filename()
                 ),
-                'contextid' => $file->get_contextid(),
                 'fileid' => $file->get_id(),
-                'pdfitemid' => $this->pdfitemid,
+                'isfirst' => $isfirst,
             ];
+            $isfirst = false;
 
             if (isset($annotatedfiles[$file->get_id()])) {
                 $annotatedfile = $annotatedfiles[$file->get_id()];
                 $model['annotatedfileurl'] = moodle_url::make_pluginfile_url(
                     $annotatedfile->get_contextid(),
-                    'local_pdfjs',
+                    $annotatedfile->get_component(),
                     $annotatedfile->get_filearea(),
                     $annotatedfile->get_itemid(),
                     $annotatedfile->get_filepath(),
                     $annotatedfile->get_filename()
                 );
-                $model['annotatedfileid'] = $annotatedfile->get_id();
                 lib::register_file_for_viewing($annotatedfile->get_id());
             }
 
             if (!$this->readonly) {
                 lib::register_file_for_annotating($file->get_id());
             }
+            $pdfviewerurl = new moodle_url(
+                "/local/pdfjs/lib/pdfjs/web/viewer.html",
+                [
+                    'readonly' => $this->readonly,
+                    'pdfitemid' => $this->pdfitemid,
+                    'fileid' => $file->get_id(),
+                    'filepath' => $model['annotatedfileurl'] ?? $model['fileurl']
+                ]
+            );
+            $model['pdfviewerurl'] = $pdfviewerurl->out();
 
             $template->files[] = (object)$model;
         }
 
-        $template->multiplefiles = (count($template->files) > 1);
         $template->readonly = $this->readonly;
-        $template->pdfjsinstanceid = uniqid($this->pdfitemid);
 
         return $template;
     }

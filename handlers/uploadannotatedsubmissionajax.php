@@ -30,18 +30,17 @@ require(__DIR__ . '/../../../config.php');
 
 // Authenticate the user.
 $pdfitemid = required_param('pdfitemid', PARAM_INT);
-$fileid = required_param('fileid', PARAM_INT);
-$contextid = required_param('contextid', PARAM_INT);
-$filename = required_param('filename', PARAM_TEXT);
+$annotatedfileid = required_param('annotatedfileid', PARAM_INT);
 
-$context = context::instance_by_id($contextid);
-
-require_login($context->get_course_context()->instanceid);
-require_capability('local/pdfjs:annotatepdf', $context);
-lib::file_registered_for_annotating($fileid);
+lib::file_registered_for_annotating($annotatedfileid);
 require_sesskey();
 
 $fs = get_file_storage();
+$annotatedfile = $fs->get_file_by_id($annotatedfileid);
+$context = context::instance_by_id($annotatedfile->get_contextid());
+
+require_login($context->get_course_context()->instanceid);
+require_capability('local/pdfjs:annotatepdf', $context);
 
 if (!is_array($_FILES) || count($_FILES) < 1) {
     throw new moodle_exception('nofile');
@@ -65,43 +64,35 @@ if (($uploadedfile['size'] > get_max_upload_file_size($CFG->maxbytes))) {
 manager::scan_file($uploadedfile['tmp_name'], $uploadedfile['name'], true);
 
 $fs = get_file_storage();
-// Check if the file already exist.
-$existingfile = $fs->get_file(
-    $contextid,
+// Check if the user already has annotations stored against this file.
+$existingfiles = $fs->get_area_files(
+    $context->id,
     'local_pdfjs',
     'pdfannotations',
-    $pdfitemid,
-    '/',
-    $filename
+    $pdfitemid
 );
 
-if ($existingfile && $existingfile->get_userid() == $USER->id) {
-    $existingfile->delete();
+foreach ($existingfiles as $existingfile) {
+    if ($existingfile->get_source() == $annotatedfileid) {
+        $existingfile->delete();
+    }
 }
 
 $filerecord = new stdClass();
 $filerecord->component = 'local_pdfjs';
-$filerecord->contextid = $contextid;
+$filerecord->contextid = $context->id;
 $filerecord->userid = $USER->id;
 $filerecord->filearea = 'pdfannotations';
-$filerecord->filename = $filename;
+$filerecord->filename = $annotatedfile->get_filename();
 $filerecord->filepath = '/';
 $filerecord->itemid = $pdfitemid;
 $filerecord->license = $CFG->sitedefaultlicense;
 $filerecord->author = fullname($USER);
-$filerecord->source = $fileid;
+$filerecord->source = $annotatedfile->get_id();
 $filerecord->filesize = $uploadedfile['size'];
 
-$storedfile = $fs->create_file_from_pathname($filerecord, $uploadedfile['tmp_name']);
+$annotationfile = $fs->create_file_from_pathname($filerecord, $uploadedfile['tmp_name']);
 
 echo json_encode((object)[
-    'fileid' => $storedfile->get_id(),
-    'url' => moodle_url::make_pluginfile_url(
-        $contextid,
-        'local_pdfjs',
-        'pdfannotations',
-        $pdfitemid,
-        '/',
-        $filename
-    )->out(false),
+    'fileid' => $annotationfile->get_id(),
 ]);

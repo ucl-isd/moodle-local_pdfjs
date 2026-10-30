@@ -51,6 +51,7 @@ class lib {
             &&
             in_array($fileid, $SESSION->local_pdfjs_annotatingfiles);
     }
+
     public static function register_file_for_viewing(int $fileid): void {
         global $SESSION;
 
@@ -110,6 +111,13 @@ class lib {
             $sourceitemid
         );
 
+        $targetfiles = $fs->get_area_files(
+            $context->id,
+            'local_pdfjs',
+            'pdfannotations',
+            $targetitemid
+        );
+
         foreach ($files as $filetomove) {
             $sourcefile = $fs->get_file_by_id($filetomove->get_source());
 
@@ -121,6 +129,12 @@ class lib {
                 (int)$filetomove->get_userid() !== $userid
             ) {
                 continue;
+            }
+
+            foreach ($targetfiles as $targetfile) {
+                if ($targetfile->get_source() === $filetomove->get_source()) {
+                    $targetfile->delete();
+                }
             }
 
             $fs->create_file_from_storedfile(['itemid' => $targetitemid], $filetomove);
