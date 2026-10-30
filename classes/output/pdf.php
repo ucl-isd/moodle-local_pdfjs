@@ -138,11 +138,12 @@ class pdf implements renderable, templatable {
         return $template;
     }
 
+    // Read only viewers of the annotated files, keyed by filename.
     public function get_pdfjs_file_viewers(): array {
         $retval = [];
 
-        foreach ($this->get_annotatedfile_urls() as $fileurl) {
-            $retval[] = new moodle_url("/local/pdfjs/lib/pdfjs/web/viewer.html", ['filepath' => $fileurl, 'readonly' => true]);
+        foreach ($this->get_annotatedfile_urls() as $filename => $fileurl) {
+            $retval[$filename] = new moodle_url("/local/pdfjs/lib/pdfjs/web/viewer.html", ['filepath' => $fileurl, 'readonly' => true]);
         }
 
         return $retval;
@@ -167,7 +168,7 @@ class pdf implements renderable, templatable {
             if (isset($annotatedfiles[$file->get_id()])) {
                 $annotatedfile = $annotatedfiles[$file->get_id()];
 
-                $retval[] = moodle_url::make_pluginfile_url(
+                $retval[$file->get_filename()] = moodle_url::make_pluginfile_url(
                     $annotatedfile->get_contextid(),
                     'local_pdfjs',
                     $annotatedfile->get_filearea(),
