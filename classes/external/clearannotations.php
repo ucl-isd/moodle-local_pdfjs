@@ -52,6 +52,7 @@ class clearannotations extends external_api {
      */
     public static function execute(int $pdfitemid, int $fileid): array {
         global $USER;
+
         self::validate_parameters(
             self::execute_parameters(),
             [
@@ -71,26 +72,22 @@ class clearannotations extends external_api {
         }
 
         require_capability('local/pdfjs:annotatepdf', context::instance_by_id($file->get_contextid()));
-        lib::file_registered_for_annotating($file->get_source());
-        if (
-            $file->get_userid() != $USER->id
-            || $file->get_itemid() != $pdfitemid
-            || $file->get_filearea() != 'pdfannotations'
-        ) {
-            return [
-                'success' => false,
-                'errorcode' => 'invalid file',
-                'message' => get_string('refreshpageforchanges', 'local_pdfjs'),
-            ];
+        lib::require_file_registered_for_annotating($file->get_id());
+
+        $fs = get_file_storage();
+        $targetfiles = $fs->get_area_files(
+            $file->get_contextid(),
+            'local_pdfjs',
+            'pdfannotations',
+            $pdfitemid,
+        );
+
+        foreach ($targetfiles as $targetfile) {
+            if ($targetfile->get_source() == $file->get_id() && $targetfile->get_userid() == $USER->id) {
+                $targetfile->delete();
+            }
         }
 
-        if (!$file->delete()) {
-            return [
-                'success' => false,
-                'errorcode' => 'unable to delete file',
-                'message' => get_string('refreshpageforchanges', 'local_pdfjs'),
-            ];
-        }
         return [
             'success' => true,
             'errorcode' => null,
