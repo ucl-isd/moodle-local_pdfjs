@@ -51,6 +51,8 @@ class clearannotations extends external_api {
      * @return array
      */
     public static function execute(int $pdfitemid, int $fileid): array {
+        global $USER;
+
         self::validate_parameters(
             self::execute_parameters(),
             [
@@ -81,7 +83,7 @@ class clearannotations extends external_api {
         );
 
         foreach ($targetfiles as $targetfile) {
-            if ($targetfile->get_source() == $file->get_id() && $targetfile->get_userid() == $file->get_userid()) {
+            if ($targetfile->get_source() == $file->get_id() && $targetfile->get_userid() == $USER->id) {
                 $targetfile->delete();
             }
         }
