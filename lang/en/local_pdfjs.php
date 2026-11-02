@@ -23,6 +23,10 @@
 
 $string['annotationscleared'] = 'Annotations cleared';
 $string['annotationssaved'] = 'Annotations saved';
+$string['annotationssavefailed'] = 'Annotations could not be saved';
 $string['clearannotations'] = 'Clear annotations';
+$string['filenotregisteredforannotating'] = 'This file has not been opened for annotating. Please refresh the page and try again.';
+$string['pdfjs:annotatepdf'] = 'Annotate PDF';
+$string['pdfjs:viewannotations'] = 'View annotations';
 $string['refreshpageforchanges'] = 'Please refresh page to see changes';
 $string['saveannotations'] = 'Save annotations';

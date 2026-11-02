@@ -2,3 +2,20 @@
 #documentProperties {
     display: none;
 }
+#localpdfjsClearAnnotationsDiv,
+#localpdfjsSaveAnnotationsDiv,
+#localpdfjsClearAnnotationsButton,
+#localpdfjsSaveAnnotationsButton {
+    aspect-ratio: auto;
+    width: auto;
+}
+
+#localpdfjsClearAnnotationsButton,
+#localpdfjsSaveAnnotationsButton {
+    padding-inline: 6px;
+}
+
+#localpdfjsClearAnnotationsButton::before,
+#localpdfjsSaveAnnotationsButton::before {
+    display: none;
+}
