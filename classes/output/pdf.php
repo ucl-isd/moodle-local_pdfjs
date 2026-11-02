@@ -40,6 +40,7 @@ class pdf implements renderable, templatable {
     private int $pdfitemid;
     private string $component;
     private string $formwrapperid;
+    private bool $readonly;
 
     /**
      * Constructor
