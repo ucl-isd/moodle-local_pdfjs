@@ -4,18 +4,22 @@
 }
 #localpdfjsClearAnnotationsDiv,
 #localpdfjsSaveAnnotationsDiv,
+#localpdfjsFullScreenDiv,
 #localpdfjsClearAnnotationsButton,
-#localpdfjsSaveAnnotationsButton {
+#localpdfjsSaveAnnotationsButton,
+#localpdfjsFullScreenButton {
     aspect-ratio: auto;
     width: auto;
 }
 
 #localpdfjsClearAnnotationsButton,
-#localpdfjsSaveAnnotationsButton {
+#localpdfjsSaveAnnotationsButton,
+#localpdfjsFullScreenButton {
     padding-inline: 6px;
 }
 
 #localpdfjsClearAnnotationsButton::before,
-#localpdfjsSaveAnnotationsButton::before {
+#localpdfjsSaveAnnotationsButton::before,
+#localpdfjsFullScreenButton::before {
     display: none;
 }

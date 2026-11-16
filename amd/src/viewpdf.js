@@ -81,6 +81,16 @@ var controller = {
                 addToast(error, {type: 'error'});
             });
     },
+
+    togglefullscreen: (pdfitemid, fileid) => {
+        const iframe = document.getElementById("pdfjsiframe_" + pdfitemid + "_" + fileid);
+
+        if (document.fullscreenElement === iframe) {
+            return document.exitFullscreen();
+        }
+
+        return iframe.requestFullscreen();
+    },
 };
 
 
@@ -91,6 +101,7 @@ export const init = async (formwrapperid, pdfitemid, readonly) => {
         'annotationssavefailed',
         'saveannotations',
         'clearannotations',
+        'fullscreen',
     ]);
 
     const formwrapper = document.querySelector("#" + (formwrapperid || 'noid') + " form");
@@ -109,6 +120,10 @@ export const init = async (formwrapperid, pdfitemid, readonly) => {
 
         if (message.data.message == 'saveannotations') {
             controller.saveannotations(message.data.pdfitemid, message.data.fileid);
+        }
+
+        if (message.data.message == 'togglefullscreen') {
+            controller.togglefullscreen(message.data.pdfitemid, message.data.fileid);
         }
     };
 
