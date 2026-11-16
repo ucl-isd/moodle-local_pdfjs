@@ -47,6 +47,6 @@
 
 {{#js}}
     require(['local_pdfjs/viewpdf'], function (viewpdf) {
-    viewpdf.init("{{formwrapperid}}", '{{pdfitemid}}'), {{readonly}};
+    viewpdf.init("{{formwrapperid}}", '{{pdfitemid}}', {{#readonly}}true{{/readonly}}{{^readonly}}false{{/readonly}});
     });
 {{/js}}
